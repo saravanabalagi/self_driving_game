@@ -5,8 +5,9 @@ import threading
 print("Starting...\nPress P to stop")
 
 import time
-for i in range(5):
-	print(5-i)
+wait_time = 5
+for i in range(wait_time):
+	print(wait_time-i)
 	time.sleep(1)
 
 start = time.time()
