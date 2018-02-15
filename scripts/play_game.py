@@ -4,6 +4,7 @@ from grab_screen import get_screen, save_image, get_scaled_grayscale
 from grab_key import get_keys, save_keys
 import numpy as np
 import os, sys
+from collections import deque
 
 # Keys
 W = 0x11
@@ -12,9 +13,10 @@ S = 0x1F
 D = 0x20
 
 def send_key_input(key):
-	repeat = 1
-	if key == W or key == S:
-		repeat = 10
+	# repeat = 1
+	# if key == W or key == S:
+		# repeat = 5
+	repeat = 5
 	for i in range(repeat):
 		press_key(key)
 	# release_key(key)
@@ -53,18 +55,30 @@ for i in range(wait_time):
 	time.sleep(1)
 
 start = time.time()
+last_p_time = 0
 counter = 0
+labels_q = deque()
+paused = False
 while True:
 	keys = get_keys()
-	if 'P' in keys: break
-	screen = get_scaled_grayscale(get_screen())
-	label = np.argmax(model.predict(screen[None, None, :]))
-	label_to_key(label)
-	print(label)
-	counter += 1
-	if counter%100 == 0:
-		time_taken = time.time() - start
-		print(counter/time_taken, "fps")
+	if 'O' in keys:
+		if time.time() - last_p_time > 0.5: 
+			last_p_time = time.time()
+			paused = not paused
+			print("Pause: ", paused)
+			if paused == True: paused_time = time.time(); release_all_keys()
+			if paused == False: start += time.time() - paused_time
+	if not paused:
+		screen = get_scaled_grayscale(get_screen())
+		label = np.argmax(model.predict(screen[None, None, :]))
+		label_to_key(label)
+		if len(list(labels_q)) > 10: labels_q.popleft()
+		labels_q.append(label)
+		print(list(labels_q), end='\r')
+		counter += 1
+		if counter%100 == 0:
+			time_taken = time.time() - start
+			print('{0:2.3f}'.format(counter/time_taken) + "fps")
 
 
 
