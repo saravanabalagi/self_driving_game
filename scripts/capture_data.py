@@ -1,6 +1,5 @@
 from grab_screen import get_screen, save_image
 from grab_key import get_keys, save_keys
-import threading
 
 print("Starting...\nPress P to stop")
 

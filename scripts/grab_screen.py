@@ -19,6 +19,11 @@ def get_screen(x_start=SCREEN_X_START, x_end=SCREEN_X_END, y_start=SCREEN_Y_STAR
 	screen = cv2.cvtColor(screen, cv2.COLOR_BGR2RGB)
 	return screen
 
+def get_scaled_grayscale(img):
+	img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+	img = cv2.resize(img, (100, 75))
+	return img
+
 def save_image(img):
 	global COUNTER
 	threading.Thread(target=write_image, args=(img, COUNTER, )).start()
