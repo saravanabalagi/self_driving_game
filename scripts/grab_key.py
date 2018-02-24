@@ -31,31 +31,28 @@ def get_keys():
 	global_keys.append(keys)
 	return keys
 
-def save_keys():
+def keys_to_label(keys):
+	label = 0
+	if 'W' in keys and 'A' in keys:		        label = 5 # WA
+	elif 'W' in keys and 'D' in keys:	        label = 6 # WD
+	elif 'S' in keys and 'A' in keys:	        label = 7 # SA
+	elif 'S' in keys and 'D' in keys:	        label = 8 # SD
+	elif 'W' in keys:	        				label = 1 # W
+	elif 'S' in keys:	        				label = 2 # S
+	elif 'A' in keys:	        				label = 3 # A
+	elif 'D' in keys:	        				label = 4 # D
+	return label
 
+def get_global_keys():
 	global global_keys
 
 	labels = []
-	path = os.path.join(os.getcwd(), '../data/')
-	if not os.path.exists(path):
-		os.makedirs(path)
-	labels_file_path = os.path.join(path, 'labels.txt')
+	for keys in global_keys:
+		label = keys_to_label(keys)
+		labels.append(label)
 
-	with open(labels_file_path, 'w+', newline='') as labels_file:
-		for keys in global_keys:
-			label = 0
-			if 'W' in keys and 'A' in keys:		        label = 5 # WA
-			elif 'W' in keys and 'D' in keys:	        label = 6 # WD
-			elif 'S' in keys and 'A' in keys:	        label = 7 # SA
-			elif 'S' in keys and 'D' in keys:	        label = 8 # SD
-			elif 'W' in keys:	        				label = 1 # W
-			elif 'S' in keys:	        				label = 2 # S
-			elif 'A' in keys:	        				label = 3 # A
-			elif 'D' in keys:	        				label = 4 # D
-			labels_file.write('{0}\n'.format(label))
-	
-	return labels, global_keys
+	return labels
 
 if __name__ == '__main__':
-	save_keys(get_keys())
+	print(get_keys())
 	
