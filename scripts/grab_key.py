@@ -18,8 +18,6 @@ keyCodeList.append(arrow_down)
 keyCodeList.append(arrow_left)
 keyCodeList.append(arrow_right)
 
-global_keys = []
-
 def get_keys():
 	keys = []
 	for key in keyList:
@@ -28,7 +26,6 @@ def get_keys():
 	for keycode in keyCodeList:
 		if win32api.GetAsyncKeyState(keycode):
 			keys.append(keycode)
-	global_keys.append(keys)
 	return keys
 
 def keys_to_label(keys):
@@ -42,16 +39,6 @@ def keys_to_label(keys):
 	elif 'A' in keys:	        				label = 3 # A
 	elif 'D' in keys:	        				label = 4 # D
 	return label
-
-def get_global_keys():
-	global global_keys
-
-	labels = []
-	for keys in global_keys:
-		label = keys_to_label(keys)
-		labels.append(label)
-
-	return labels
 
 if __name__ == '__main__':
 	print(get_keys())

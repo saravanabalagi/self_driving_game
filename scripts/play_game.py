@@ -1,12 +1,11 @@
 from send_input import label_to_keys
 from keras.models import load_model
-from grab_screen import get_screen, save_image, get_scaled_grayscale
-from grab_key import get_keys, save_keys
+from grab_screen import get_screen, get_scaled_grayscale
+from grab_key import get_keys
 import numpy as np
 import os, sys
 from collections import deque
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 file_number = int(sys.argv[1])
 path_models = os.path.join(os.getcwd(), '../models')
 model_name = 'model_' + '{0:03d}'.format(file_number)
@@ -32,11 +31,11 @@ while True:
 		if time.time() - last_p_time > 0.5: 
 			last_p_time = time.time()
 			paused = not paused
-			print(list(labels_q), 'Paused    ' end='\r')
-			if paused == True: paused_time = time.time(); release_all_keys()
+			print(list(labels_q), 'Paused    ', end='\r')
+			if paused == True: paused_time = time.time(); label_to_keys(0)
 			if paused == False: start += time.time() - paused_time
 	if 'L' in keys:
-		print("Exiting...")
+		print("\n\nExiting...")
 		break
 	if not paused:
 		screen = get_scaled_grayscale(get_screen())
@@ -45,7 +44,7 @@ while True:
 
 		if len(list(labels_q)) > 15: labels_q.popleft()
 		labels_q.append(label)
-		print(list(labels_q), '@{0:4.2}fps'.format(counter/(time.time() - start)) ,end='\r')
+		print(list(labels_q), '@{0:4.2f}fps'.format(counter/(time.time() - start)) ,end='\r')
 
 		counter += 1
 
