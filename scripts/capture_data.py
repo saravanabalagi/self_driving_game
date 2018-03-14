@@ -1,136 +1,96 @@
-from grab_screen import get_screen, get_scaled_grayscale
-from grab_key import get_keys, keys_to_label
-from keras.models import load_model
-from collections import Counter
-from collections import deque
-import numpy as np
-import threading
-import os, sys
+from deepgtav.messages import Start, Stop, Config, Dataset, frame2numpy, Scenario
+from deepgtav.client import Client
+import argparse
 import time
-import cv2
+from tqdm import tqdm
 
-from keras.utils import to_categorical
-number_of_classes = 9
+weatherList = ["CLEAR", "EXTRASUNNY", "CLOUDS", "OVERCAST", "RAIN", "CLEARING", "THUNDER", "SMOG", "FOGGY", "XMAS", "SNOWLIGHT", "BLIZZARD", "NEUTRAL", "SNOW" ]
 
-PATH_IMG = os.path.join(os.getcwd(), '../data/source')
-PATH_KEY = os.path.join(os.getcwd(), '../data/labels.txt')
-PATH_MODELS = os.path.join(os.getcwd(), '../models')
+def reset(weatherIndex=0):
+	''' Resets position of car to a specific location '''
+	# Same conditions as below | 
+	client.sendMessage(Stop())
+	dataset = Dataset(rate=30, frame=[400,300], throttle=True, brake=True, steering=True, location=True, speed=True, yawRate=True)
+	# Automatic driving scenario
+	# scenario = Scenario(weather='EXTRASUNNY',vehicle='voltic',time=[12,0],drivingMode=[786603,70.0],location=[-2573.13916015625, 3292.256103515625, 13.241103172302246]) 
+	# scenario = Scenario(weather=weatherList[weatherIndex],vehicle='voltic',time=[12,0],drivingMode=[4294967295,70.0],location=[-2573.13916015625, 3292.256103515625, 13.241103172302246]) 
+	scenario = Scenario(weather=weatherList[weatherIndex], vehicle='voltic', time=[12,0], drivingMode=[786603,20.0]) 
+	client.sendMessage(Start(scenario=scenario,dataset=dataset)) # Start request
 
-if not os.path.exists(PATH_IMG): os.makedirs(PATH_IMG)
+# Stores a pickled dataset file with data coming from DeepGTAV
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(description=None)
+	parser.add_argument('-l', '--host', default='localhost', help='The IP where DeepGTAV is running')
+	parser.add_argument('-p', '--port', default=8000, help='The port where DeepGTAV is running')
+	parser.add_argument('-d', '--dataset_path', default='dataset.pz', help='Place to store the dataset')
+	args = parser.parse_args()
 
-def train(model, screens, labels):
-	global number_of_classes
-	model.fit(screens[:, None, ...], to_categorical(labels, number_of_classes), verbose=0)
+	# Creates a new connection to DeepGTAV using the specified ip and port 
+	client = Client(ip=args.host, port=args.port, datasetPath=args.dataset_path, compressionLevel=9) 
+	reset()
+	
+	count = 0
+	no_of_images = 0
+	weatherCount = 0
+	to_remove = []
+	data_to_collect_per_weather = 20000
+	reset_every = int(data_to_collect_per_weather / 8)
+	print('{:>15} | {:^16} | {:^21} | {}'.format("Weather", "Progress", "[str, thtl, brk]", "Speed"))
 
-def print_capture_stats(label, key_list, fps):
-	global labels_q
-	if len(list(labels_q)) > 10: labels_q.popleft()
-	labels_q.append(label)
-	print(list(labels_q), Counter(key_list), '@{0:4.2f}fps'.format(fps), end='\r')
+	while True: # Main loop
+		try:
+			# Message recieved as a Python dictionary
+			message = client.recvMessage()
+			new_location = message['location']
 
-def save_image(img, number, path):
-	cv2.imwrite(os.path.join(path, 'screen_' + '{0:03d}'.format(number) + '.jpg'), img)
+			count += 1
+			no_of_images += 1
+			print('{:>15}: {:>8d}/{:<8d} | [{: 3.2f}, {: 3.2f}, {: 3.2f}] | {:5.2f}'.format(weatherList[weatherCount], no_of_images, 
+				data_to_collect_per_weather, message['steering'], message['throttle'], message['brake'], message['speed']), end='\r')
+			
+			if no_of_images == 1:
+				old_location = new_location
 
-def save_key(label, file):
-	print(label, file=file)
+			# if (count % 100) == 0:
+				# print(count, end='\r')
 
-def get_last_file_number(modeL_name, path):
-    numbers = [-1]
-    for file in os.listdir(path):
-        filename = os.path.splitext(file)[0]
-        ext = os.path.splitext(file)[1]
-        if ext.lower() not in ['.h5']: continue
-        if filename.startswith(model_name): 
-            try: numbers.append(int(filename[len(model_name)+1:]))
-            except: pass
-    counter = max(numbers)
-    return counter
+			# Checks if car is stuck, resets position if it is
+			if (count % 250)==0:
+				# Float position converted to ints so it doesn't have to be in the exact same position to be reset
+				if int(new_location[0]) == int(old_location[0]) and int(new_location[1]) == int(old_location[1]) and int(new_location[2]) == int(old_location[2]):
+					print('{0:>15}: {1:>8d}/{2:<8d} | Car is stuck for frames {3}. Resetting...                  '.format(weatherList[weatherCount], no_of_images, 
+							data_to_collect_per_weather, [count-250, count]))
+					to_remove.append([count-250, count])
+					no_of_images -= 250
+					reset(weatherCount)
+				old_location = message['location']
+				# print('At location: ' + str(old_location))
 
-def save_model(model, model_name, model_path):
-	save_count = get_last_file_number(model_name, model_path)+1
-	print("Saving", model_name+ '_{0:03d}'.format(save_count) +'.h5', end='\r')
-	model.save(model_path + '\\' + model_name + '_{0:03d}'.format(save_count) +'.h5')
-	print(model_name+ '_{0:03d}'.format(save_count) +'.h5', "saved successfully")
-	save_count += 1
+			# reset once in a while
+			if no_of_images % reset_every == 0:
+				reset(weatherCount)
+
+			# stopping criteria
+			if no_of_images >= data_to_collect_per_weather: 
+				no_of_images = 0
+				weatherCount += 1
+				if weatherCount > len(weatherList)-1: 
+					break
+				print("")
+				reset(weatherCount)
 
 
-# Load model if necessary
-if(len(sys.argv)==1): 
-	print("No training will take place.\nMode: Capture, Save\n\n")
-	training_enabled = False
-else:
-	model_number = int(sys.argv[1])
-	if(len(sys.argv)==3):
-		model_number_ext = int(sys.argv[2])
-		model_name = 'model_' + '{0:03d}'.format(model_number) + '{0:03d}'.format(model_number_ext)
-	else: model_name = 'model_' + '{0:03d}'.format(model_number)
-	model_name_without_ext = 'model_' + '{0:03d}'.format(model_number)
-	print("Loading", model_name, end='\r')
-	model = load_model(PATH_MODELS + '\\' + model_name + '.h5')
-	print(model_name, "loaded successfully")
-	print("Mode: Capture, Train, Save\n\nCapture Stats:")
-	training_enabled = True
+		except KeyboardInterrupt:
+			i = input('\nPaused. Press p to continue and q to exit... ')
+			if i == 'p':
+				continue
+			elif i == 'q':
+				break
 
-# Wait for 5 seconds before capture
-wait_time = 5
-for i in range(wait_time):
-	print("Starting in",wait_time-i, end='\r')
-	time.sleep(1)
-print("Press O to pause\nPress L to stop\n")
-
-# Main capture loop
-start = time.time()
-last_p_time = 0
-paused = False
-counter = 0
-labels_q = deque()
-labels_file = open(PATH_KEY, 'w+')
-keys_list = []
-
-batch_size = 125
-keys_training_batch = []
-screens_training_batch = []
-
-while True:
-	keys = get_keys()
-	if 'O' in keys:
-		if time.time() - last_p_time > 0.5: 
-			last_p_time = time.time()
-			paused = not paused
-			print(list(labels_q), Counter(keys_list), 'Paused   ', end='\r')
-			if paused == True: paused_time = time.time();
-			if paused == False: start += time.time() - paused_time
-	if 'L' in keys:
-		print("\n\nExiting...")
-		break
-
-	if not paused:
-
-		#grab screen and key
-		screen = get_screen()
-		label = keys_to_label(keys)
-		keys_list.append(label)
-
-		# print capture stats
-		fps = counter/(time.time()-start)
-		print_capture_stats(label, keys_list, fps)
-
-		# save image and key
-		threading.Thread(target=save_image, args=(screen, counter, PATH_IMG,)).start()
-		threading.Thread(target=save_key, args=(keys_to_label(keys), labels_file,)).start()
-
-		# train model
-		if training_enabled:
-			screen_resized = get_scaled_grayscale(screen)
-			screens_training_batch.append(screen_resized)
-			keys_training_batch.append(label)
-			if (counter+1)%batch_size==0:
-				threading.Thread(target=train, args=(model, np.array(screens_training_batch), np.array(keys_training_batch),)).start()
-				keys_training_batch = []
-				screens_training_batch = []
-
-		counter += 1
-
-labels_file.close()
-if training_enabled:
-	save_model(model, model_name_without_ext, PATH_MODELS)
+	# save to_remove
+	with open('to_remove.txt', 'a+') as file:
+		print(to_remove, file=file)
+			
+	# DeepGTAV stop message
+	client.sendMessage(Stop())
+	client.close() 

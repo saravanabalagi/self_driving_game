@@ -1,10 +1,8 @@
-from send_input import label_to_keys
 from keras.models import load_model
-from grab_screen import get_screen, get_scaled_grayscale
-from grab_key import get_keys
 import numpy as np
+import pyxinput
 import os, sys
-from collections import deque
+import time
 
 file_number = int(sys.argv[1])
 path_models = os.path.join(os.getcwd(), '../models')
@@ -13,7 +11,6 @@ model = load_model(path_models + '\\' + model_name + '.h5')
 
 print("Starting...\nPress O to pause\nPress L to stop")
 
-import time
 wait_time = 0
 for i in range(wait_time):
 	print(wait_time-i)
@@ -22,10 +19,14 @@ for i in range(wait_time):
 start = time.time()
 last_p_time = 0
 counter = 0
-labels_q = deque()
 paused = False
 
-while True:
+try:
+    joystick = pyxinput.vController()
+except MaxInputsReachedError:
+    print('Unable to connect controller for testing.')
+
+while joystick:
 	keys = get_keys()
 	if 'O' in keys:
 		if time.time() - last_p_time > 0.5: 
@@ -36,15 +37,15 @@ while True:
 			if paused == False: start += time.time() - paused_time
 	if 'L' in keys:
 		print("\n\nExiting...")
+		del joystick
 		break
 	if not paused:
 		screen = get_scaled_grayscale(get_screen())
-		label = np.argmax(model.predict(screen[None, None, :]))
-		label_to_keys(label)
-
-		if len(list(labels_q)) > 15: labels_q.popleft()
-		labels_q.append(label)
-		print(list(labels_q), '@{0:4.2f}fps'.format(counter/(time.time() - start)) ,end='\r')
+		steering, throttle, brake = model.predict(screen[None, :])
+		joystick.set_value('AxisLx', steering)
+		joystick.set_value('TriggerR', throttle)
+		joystick.set_value('TriggerL', brake)
+		print('{:3.2f}, {:3.2f}, {3.2f}'.format(steering, throttle, brake), '@{0:4.2f}fps'.format(counter/(time.time() - start)) ,end='\r')
 
 		counter += 1
 
