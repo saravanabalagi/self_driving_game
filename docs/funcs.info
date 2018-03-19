@@ -1,0 +1,9 @@
+void AI::TASK_VEHICLE_DRIVE_TO_COORD_LONGRANGE(Ped ped, Vehicle vehicle, float x, float y, float z, float speed, int driveMode, float stopRange)
+
+void UI::SET_BLIP_COORDS(Any p0, float p1, float p2, float p3)
+Blip UI::ADD_BLIP_FOR_RADIUS(float x, float y, float z, float radius)
+Blip UI::ADD_BLIP_FOR_COORD(float x, float y, float z)
+void UI::SET_BLIP_COLOUR(int blip, int color)
+void UI::SET_BLIP_ROUTE(Blip blip, BOOL enabled)
+void UI::SET_BLIP_ROUTE_COLOUR(Blip blip, int colour)
+void UI::REMOVE_BLIP(Blip blip)
