@@ -18,20 +18,16 @@ def reset(weatherIndex=0):
 	# Automatic driving scenario
 	# scenario = Scenario(weather='EXTRASUNNY',vehicle='voltic',time=[12,0],drivingMode=[786603,70.0],location=[-2573.13916015625, 3292.256103515625, 13.241103172302246]) 
 	# scenario = Scenario(weather=weatherList[weatherIndex],vehicle='voltic',time=[12,0],drivingMode=[4294967295,70.0],location=[-2573.13916015625, 3292.256103515625, 13.241103172302246]) 
-	scenario = Scenario(weather=weatherList[weatherIndex], vehicle='voltic', time=[12,0], drivingMode=[2883621,18.0], wander=False) 
+	scenario = Scenario(weather=weatherList[weatherIndex], vehicle='voltic', time=[12,0], drivingMode=[2883621,20.0], wander=False) 
 	client.sendMessage(Start(scenario=scenario,dataset=dataset)) # Start request
 
 # Stores a pickled dataset file with data coming from DeepGTAV
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description=None)
-	parser.add_argument('-l', '--host', default='localhost', help='The IP where DeepGTAV is running')
+	parser.add_argument('-l', '--host', default='localhost', help='The IP 	where DeepGTAV is running')
 	parser.add_argument('-p', '--port', default=8000, help='The port where DeepGTAV is running')
 	parser.add_argument('-d', '--dataset_path', default='dataset.pz', help='Place to store the dataset')
 	args = parser.parse_args()
-
-	# Creates a new connection to DeepGTAV using the specified ip and port 
-	client = Client(ip=args.host, port=args.port, datasetPath=args.dataset_path, compressionLevel=9, frame_capture_size=frame_capture_size, frame_save_size=frame_save_size) 
-	reset()
 
 	# how many frames to skip in the beginning
 	frames_to_skip = 500
@@ -44,30 +40,37 @@ if __name__ == '__main__':
 	to_remove = []
 	speed = []
 	direction = []
+	pred_speed = None
+	pred_dir = None
 
 	# how much data to collect
 	data_to_collect_per_weather = 20000
 	rep_per_weather = 8
 	reset_every = int(data_to_collect_per_weather / rep_per_weather)
 
+	# Creates a new connection to DeepGTAV using the specified ip and port 
+	client = Client(ip=args.host, port=args.port, datasetPath=args.dataset_path, compressionLevel=9, frame_capture_size=frame_capture_size, frame_save_size=frame_save_size) 
+	reset(weatherCount)
+
 	print('Data to collect per weather:', data_to_collect_per_weather)
 	print('Reset every:', reset_every, 'frames in each weather\n')
-	print('{:>15} | {:^16} | {:^21} | {} | {}'.format("Weather", "Progress", "[str, thtl, brk]", "Speed", "Direction"))
+	print('{:>15} | {:^16} | {:^21} | {:^8} | {}'.format("Weather", "Progress", "[str, thtl, brk]", "Speed", "Direction"))
 
 	while True: # Main loop
 		try:
+			# Message recieved as a Python dictionary
+			message = client.recvMessage(pre_count+1>=0)
+			if message is None: print('Message Error'); continue
 
 			if pre_count<0: pre_count += 1
 			if pre_count==0:
 				count += 1
 				no_of_images += 1
 
-			# Message recieved as a Python dictionary
-			message = client.recvMessage(count>0)
 			new_location = message['location']
 			
-			print('{:>15}: {:>8d}/{:<8d} | [{: 3.2f}, {: 3.2f}, {: 3.2f}] | {:5.2f} | {} {:6.2f} | {:9}/{:< 4}   '.format(weatherList[weatherCount], no_of_images, 
-				data_to_collect_per_weather, message['steering'], message['throttle'], message['brake'], message['speed'], message['direction'][0], message['direction'][1], count, pre_count), end='\r')
+			print('{:>15}: {:>8d}/{:<8d} | [{: 3.2f}, {: 3.2f}, {: 3.2f}] | {:5.2f}/{:>2} | {} {:6.2f} | {:9}/{:< 4}'.format(weatherList[weatherCount], no_of_images, 
+				data_to_collect_per_weather, message['steering'], message['throttle'], message['brake'], message['speed'], pred_speed or '?', message['direction'][0], message['direction'][1], count, pre_count), end='\r')
 			
 			if pre_count == initial_pre_count + 1:
 				old_location = new_location
@@ -87,12 +90,14 @@ if __name__ == '__main__':
 						no_of_images = 0
 					reset(weatherCount)
 					pre_count = initial_pre_count
+					pred_speed = None 
+					pred_dir = None
 					continue
 				old_location = message['location']
 				# print('At location: ' + str(old_location))
 
 			# Check if the car is very slow
-			if pre_count <= 0: 
+			if pre_count < -1: 
 				speed.append(int(round(message['speed'])))
 				direction.append(int(message['direction'][0]))
 			if pre_count == -1:
@@ -103,6 +108,8 @@ if __name__ == '__main__':
 								data_to_collect_per_weather, pred_speed, pred_dir))
 					reset(weatherCount)
 					pre_count = initial_pre_count
+					pred_speed = None 
+					pred_dir = None
 				speed.clear()
 				direction.clear()
 				continue
@@ -112,6 +119,8 @@ if __name__ == '__main__':
 				print("")
 				reset(weatherCount)
 				pre_count = initial_pre_count
+				pred_speed = None 
+				pred_dir = None
 				continue
 
 			# stopping criteria
@@ -123,9 +132,9 @@ if __name__ == '__main__':
 				print("")
 				reset(weatherCount)
 				pre_count = initial_pre_count
+				pred_speed = None 
+				pred_dir = None
 				continue
-
-
 
 		except KeyboardInterrupt:
 			i = input('\nPaused. Press p to continue and q to exit... ')

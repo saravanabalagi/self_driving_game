@@ -27,7 +27,7 @@ class Targets:
 
     def save(self, dct, frame):
         im = frame2numpy(frame, tuple(self.frame_capture_size))
-        dct['map'] = im[480:590,13:168,:]
+        dct['minimap'] = im[480:590,7:177,:]
         dct['frame'] = cv2.resize(im, tuple(self.frame_save_size))
         if self.pickleFile != None:
             pickle.dump(dct, self.pickleFile)
