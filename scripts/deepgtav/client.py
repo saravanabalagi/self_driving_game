@@ -1,34 +1,42 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from deepgtav.messages import frame2numpy
 import json
 import socket, struct
 import pickle
 import gzip
+import cv2
+import threading
 
 class Targets:
-    def __init__(self, datasetPath, compressionLevel):
+    def __init__(self, datasetPath, compressionLevel, frame_capture_size, frame_save_size):
         self.pickleFile = None
+        self.frame_capture_size = frame_capture_size
+        self.frame_save_size = frame_save_size
         
         if datasetPath != None:
             self.pickleFile = gzip.open(datasetPath, mode='ab', compresslevel=compressionLevel)
 
-    def parse(self, frame, jsonstr):
-        try:
-            dct = json.loads(jsonstr)
-        except ValueError:
-            return None
+    def parse(self, frame, jsonstr, save=True):
+        try: dct = json.loads(jsonstr)
+        except ValueError: return None
         
-        dct['frame'] = frame
-        if self.pickleFile != None:
-            pickle.dump(dct, self.pickleFile)
+        if save: threading.Thread(target=self.save, args=(dct, frame, )).start()
         return dct
 
+    def save(self, dct, frame):
+        im = frame2numpy(frame, tuple(self.frame_capture_size))
+        dct['map'] = im[480:590,13:168,:]
+        dct['frame'] = cv2.resize(im, tuple(self.frame_save_size))
+        if self.pickleFile != None:
+            pickle.dump(dct, self.pickleFile)
+
 class Client:
-    def __init__(self, ip='localhost', port=8000, datasetPath=None, compressionLevel=0):
+    def __init__(self, ip='localhost', port=8000, datasetPath=None, compressionLevel=0, frame_capture_size=[800,600], frame_save_size=[400,300]):
         print('Trying to connect to DeepGTAV')
         
-        self.targets = Targets(datasetPath, compressionLevel)
+        self.targets = Targets(datasetPath, compressionLevel, frame_capture_size, frame_save_size)
 
         try:
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -48,7 +56,7 @@ class Client:
             return False
         return True
 
-    def recvMessage(self):
+    def recvMessage(self, save=True):
         frame = self._recvall()
         if not frame: 
             print('ERROR: Failed to receive frame')     
@@ -57,7 +65,7 @@ class Client:
         if not data: 
             print('ERROR: Failed to receive message')       
             return None
-        return self.targets.parse(frame, data.decode('utf-8'))
+        return self.targets.parse(frame, data.decode('utf-8'), save)
 
     def _recvall(self):
         #Receive first size of message in bytes
