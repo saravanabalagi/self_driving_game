@@ -1,0 +1,35 @@
+Directions:
+
+1 target behind
+2 continue on current lane
+3 take a left in signal
+4 take a right in signal
+5 go straight in signal
+6 take u in median on the left
+7 keep right/take right lane
+8 take a U in signal
+
+Driving Mode:
+
+1074528293	Rushed
+786468		Avoid Traffic
+6			Avoid Traffic Extremely
+786603		Normal
+2883621		Ignore Lights
+5		 	Sometimes Overtake Traffic
+
+Blip Colour:
+
+0: white
+1: red
+2: green
+3: blue
+17: orange
+19: purple
+20: grey
+21: brown
+23: pink
+25: dark green
+27: dark purple
+29: dark blue
+Default (Function not used): yellow

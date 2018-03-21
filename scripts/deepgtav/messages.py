@@ -6,12 +6,14 @@ import numpy as np
 from numpy.lib.stride_tricks import as_strided
 
 class Scenario:
-    def __init__(self, location=None, time=None, weather=None, vehicle=None, drivingMode=None):
+    def __init__(self, location=None, time=None, weather=None, vehicle=None, drivingMode=None, wander=None, destination=None):
         self.location = location #[x,y]
         self.time = time #[hour, minute]
         self.weather = weather #string
         self.vehicle = vehicle #string
         self.drivingMode = drivingMode #[drivingMode, setSpeed]
+        self.wander = wander #boolean
+        self.destination = destination #[x,y]
 
 class Dataset:
     def __init__(self, rate=None, frame=None, vehicles=None, peds=None, trafficSigns=None, direction=None, reward=None, 
@@ -21,7 +23,7 @@ class Dataset:
         self.vehicles = vehicles #boolean
         self.peds = peds #boolean
         self.trafficSigns = trafficSigns #boolean
-        self.direction = direction #[x,y,z]
+        self.direction = direction #boolean
         self.reward = reward #[id, p1, p2]
         self.throttle = throttle #boolean
         self.brake = brake #boolean
