@@ -57,40 +57,60 @@ def sequential(channels=1):
     model.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
     return model
 
-def image_steering_concat_model(channels=3):
+def image_map_steering_concat_model(channels=3):
 
     h = 75          # height of the image
     w = 100         # width of the image
     c = channels    # no of channels
     
-    # Level 1
+    # Level 1a
     image = Input(shape=(h,w,c))
-    conv_1_1 = Conv2D(64, kernel_size=3, kernel_initializer='normal', activation='tanh', input_shape=(h,w,c))(image)
-    conv_1_2 = Conv2D(64, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_1_1)
-    pool_1_1 = MaxPooling2D(pool_size=(2, 2))(conv_1_2)
+    conv_1a_1 = Conv2D(64, kernel_size=3, kernel_initializer='normal', activation='tanh', input_shape=(h,w,c))(image)
+    conv_1a_2 = Conv2D(64, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_1a_1)
+    pool_1a_1 = MaxPooling2D(pool_size=(2, 2))(conv_1a_2)
     
-    # Level 2
-    conv_2_1 = Conv2D(128, kernel_size=3, kernel_initializer='normal', activation='tanh')(pool_1_1)
-    conv_2_2 = Conv2D(128, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_2_1)
-    pool_2_1 = MaxPooling2D(pool_size=(2, 2))(conv_2_2)
+    # Level 2a
+    conv_2a_1 = Conv2D(128, kernel_size=3, kernel_initializer='normal', activation='tanh')(pool_1a_1)
+    conv_2a_2 = Conv2D(128, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_2a_1)
+    pool_2a_1 = MaxPooling2D(pool_size=(2, 2))(conv_2a_2)
     
     # Level 3a
-    conv_3a_1 = Conv2D(256, kernel_size=3, kernel_initializer='normal', activation='tanh')(pool_2_1)
+    conv_3a_1 = Conv2D(256, kernel_size=3, kernel_initializer='normal', activation='tanh')(pool_2a_1)
     conv_3a_2 = Conv2D(256, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_3a_1)
     conv_3a_3 = Conv2D(256, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_3a_2)
     pool_3a_1 = MaxPooling2D(pool_size=(2, 2))(conv_3a_3)
     pool_3a_1f = Flatten()(pool_3a_1)
+    
+    # Level 1c
+    maps = Input(shape=(h,w,c))
+    conv_1c_1 = Conv2D(64, kernel_size=3, kernel_initializer='normal', activation='tanh', input_shape=(h,w,c))(maps)
+    conv_1c_2 = Conv2D(64, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_1c_1)
+    pool_1c_1 = MaxPooling2D(pool_size=(2, 2))(conv_1c_2)
+    
+    # Level 2c
+    conv_2c_1 = Conv2D(128, kernel_size=3, kernel_initializer='normal', activation='tanh')(pool_1c_1)
+    conv_2c_2 = Conv2D(128, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_2c_1)
+    pool_2c_1 = MaxPooling2D(pool_size=(2, 2))(conv_2c_2)
+    
+    # Level 3c
+    conv_3c_1 = Conv2D(256, kernel_size=3, kernel_initializer='normal', activation='tanh')(pool_2c_1)
+    conv_3c_2 = Conv2D(256, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_3c_1)
+    conv_3c_3 = Conv2D(256, kernel_size=3, kernel_initializer='normal', activation='tanh')(conv_3c_2)
+    pool_3c_1 = MaxPooling2D(pool_size=(2, 2))(conv_3c_3)
+    pool_3c_1f = Flatten()(pool_3c_1)
 
     # Level 3b
     prev_steering = Input(shape=(pick_last_steering,))
     dense_3b_1 = Dense(40, kernel_initializer='normal', activation='tanh')(prev_steering)
 
     # Level 4
-    concat_4_1 = concatenate([pool_3a_1f, dense_3b_1])
-    dense_4_1 = Dense(4096, kernel_initializer='normal', activation='tanh')(concat_4_1)
-    dense_4_2 = Dense(2048, kernel_initializer='normal', activation='tanh')(dense_4_1)
-    dense_4_3 = Dense(1, kernel_initializer='normal', activation='tanh')(dense_4_2)
+    concat_4_1 = concatenate([pool_3a_1f, dense_3b_1, pool_3c_1f])
+    dense_4_1 = Dense(8192, kernel_initializer='normal', activation='tanh')(concat_4_1)
+    dense_4_2 = Dense(4096, kernel_initializer='normal', activation='tanh')(dense_4_1)
+    dense_4_3 = Dense(2048, kernel_initializer='normal', activation='tanh')(dense_4_2)
+    dense_4_4 = Dense(512, kernel_initializer='normal', activation='tanh')(dense_4_3)
+    dense_4_5 = Dense(1, kernel_initializer='normal', activation='tanh')(dense_4_4)
 
-    model = Model(inputs=[image, prev_steering], outputs=dense_4_3)
-    model.compile(loss='mse', optimizer=Adam(lr=0.00001), metrics=[mae,'accuracy'])
+    model = Model(inputs=[image, maps, prev_steering], outputs=dense_4_5)
+    model.compile(loss='mse', optimizer=Adam(lr=0.00005), metrics=[mae,'accuracy'])
     return model
