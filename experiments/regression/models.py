@@ -1,7 +1,8 @@
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
+from keras.models import Sequential, Model
+from keras.layers import Dense, Dropout, Input
 from keras.layers import Conv2D, MaxPooling2D, Flatten
 from keras.layers import BatchNormalization
+from keras.layers.merge import concatenate
 from keras.utils import np_utils
 from keras.optimizers import Adam
 from keras.metrics import mae
