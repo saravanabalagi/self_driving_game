@@ -3,6 +3,7 @@ from model import accuracy, loss
 from keras import backend
 from save_load import load
 import sys, os
+import tensorflow as tf
 
 def evaluate_model(model, x_test, y_test):
     y_pred = model.predict(x_test)
@@ -20,5 +21,7 @@ if __name__ == '__main__':
     model = load(count)
     x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=True)
     scores = evaluate_model(model, x_test, y_test)
-    print("Loss: ", scores[0])
-    print("Accuracy: ", scores[1]*100, "%")
+
+    sess = tf.Session()
+    print("Loss: ", sess.run(scores[0]))
+    print("Accuracy: ", sess.run(scores[1])*100, "%")

@@ -19,7 +19,11 @@ if __name__ == '__main__':
     model.fit(x_train, y_train, validation_split=0.1, epochs=25, batch_size=125, callbacks=[tbCallBack])
     save(model)
 
-    print('\n\n')
+    # Evaluate model
     scores = evaluate_model(model, x_test, y_test)
-    print("Loss: ", scores[0])
-    print("Accuracy: ", scores[1]*100, "%")
+
+    # Print scores
+    print('\n\n')
+    sess = tf.Session()
+    print("Loss: ", sess.run(scores[0]))
+    print("Accuracy: ", sess.run(scores[1])*100, "%")
