@@ -42,7 +42,7 @@ def tanh_model(channels=1):
     model.add(Dense(128, kernel_initializer='normal', activation='tanh'))
     model.add(Dense(1))
 
-    model.compile(loss=loss, optimizer=Adam(0.00001), metrics=['mae',accuracy])
+    model.compile(loss=loss, optimizer=Adam(0.01), metrics=['mae',accuracy])
     return model
 
 def relu_model(channels=1):

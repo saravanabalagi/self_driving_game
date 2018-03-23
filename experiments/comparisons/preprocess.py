@@ -14,7 +14,7 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
     pfile = gzip.open(file, mode='rb')
     var = pickle.load(pfile)
     im_shape = var['frame'].shape
-    print('frame.shape:', var['frame'].shape)
+    print('Original Frame shape:', var['frame'].shape)
 
     # Load all variables
     count = 0

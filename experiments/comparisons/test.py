@@ -1,7 +1,8 @@
 from preprocess import get_test_train_data
+from save_load import get_last_file_number
+from save_load import load
 from model import accuracy, loss
 from keras import backend
-from save_load import load
 import sys, os
 import tensorflow as tf
 
@@ -18,10 +19,15 @@ if __name__ == '__main__':
     if len(sys.argv)<=1: count = None
     else: count = int(sys.argv[1]);
     
-    model = load(count)
+    # Load model
+    exp_folder = 'exp_' + '{0:03d}'.format(get_last_file_number(prefix='exp_', suffix=''))
+    model = load(count, path=exp_folder)
+
+    # Evaluate model
     x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=True)
     scores = evaluate_model(model, x_test, y_test)
 
+    # Print scores
     sess = tf.Session()
     print("Loss: ", sess.run(scores[0]))
     print("Accuracy: ", sess.run(scores[1])*100, "%")
