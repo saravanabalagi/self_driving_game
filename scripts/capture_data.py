@@ -34,9 +34,9 @@ if __name__ == '__main__':
 	initial_pre_count = -(frames_to_skip-1)
 	pre_count = initial_pre_count
 
-	count = 226500
+	count = 0
 	no_of_images = 0
-	weatherCount = 11
+	weatherCount = 0
 	to_remove = []
 	speed = []
 	direction = []
