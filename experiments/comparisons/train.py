@@ -20,8 +20,8 @@ if __name__ == '__main__':
     if len(sys.argv)>1: print('Title:',sys.argv[1],'\n\n')
 
     # Get test and train data
-    file = "E:\Backup\GTA V Dataset\dataset_1.pz"
-    x_train, x_test, y_train, y_test = get_test_train_data(file, 30000, tanh=True)
+    file = "E:\Backup\GTA V Dataset\dataset.pz"
+    x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=True)
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 
     # Create model and print to log file

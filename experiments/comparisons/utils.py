@@ -1,4 +1,6 @@
 from keras import backend
+from keras.models import Model
+import cv2
 
 def print_optimizer(model):
 	print()
@@ -24,3 +26,11 @@ def print_model_summary(model):
 	model.summary()
 	print_optimizer(model)
 	print_metrics(model)
+
+def visualize_layers(model, test_input):
+	for layer in model.layers:
+		intermediate_layer_model = Model(inputs=model.input, outputs=model.get_layer(layer.name).output)
+		intermediate_output = intermediate_layer_model.predict(test_input)
+		print(intermediate_output.shape)
+		for index, image in enumerate(intermediate_output):
+			cv2.imwrite('{}_{:4d}{}'.format(layer.name, index, '.jpg'), image)
