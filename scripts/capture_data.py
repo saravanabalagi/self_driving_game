@@ -34,9 +34,9 @@ if __name__ == '__main__':
 	initial_pre_count = -(frames_to_skip-1)
 	pre_count = initial_pre_count
 
-	count = 0
+	count = 226500
 	no_of_images = 0
-	weatherCount = 0
+	weatherCount = 11
 	to_remove = []
 	speed = []
 	direction = []
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
 	# how much data to collect
 	data_to_collect_per_weather = 20000
-	rep_per_weather = 8
+	rep_per_weather = 4
 	reset_every = int(data_to_collect_per_weather / rep_per_weather)
 
 	# Creates a new connection to DeepGTAV using the specified ip and port 

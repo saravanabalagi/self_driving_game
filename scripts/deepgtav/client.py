@@ -22,7 +22,8 @@ class Targets:
         try: dct = json.loads(jsonstr)
         except ValueError: return None
         
-        if save: threading.Thread(target=self.save, args=(dct, frame, )).start()
+        # if save: threading.Thread(target=self.save, args=(dct, frame, )).start()
+        if save: self.save(dct, frame)
         return dct
 
     def save(self, dct, frame):
