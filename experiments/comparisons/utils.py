@@ -1,6 +1,8 @@
 from keras import backend
 from keras.models import Model
+import numpy as np
 import cv2
+import os
 
 def print_optimizer(model):
 	print()
@@ -27,10 +29,17 @@ def print_model_summary(model):
 	print_optimizer(model)
 	print_metrics(model)
 
-def visualize_layers(model, test_input):
+def denormalize(normalized_image):
+	return ((normalized_image/2 + 0.5) * 255).astype(np.uint8)
+
+def visualize_layers(model, test_input, path=None):
+	if path is None: path = os.getcwd()
 	for layer in model.layers:
 		intermediate_layer_model = Model(inputs=model.input, outputs=model.get_layer(layer.name).output)
-		intermediate_output = intermediate_layer_model.predict(test_input)
-		print(intermediate_output.shape)
+		intermediate_output = intermediate_layer_model.predict(test_input)[-1]
+		intermediate_output = denormalize(intermediate_output)
+		intermediate_output = np.swapaxes(intermediate_output,0,2)
+		if len(intermediate_output.shape) != 3: continue
 		for index, image in enumerate(intermediate_output):
-			cv2.imwrite('{}_{:4d}{}'.format(layer.name, index, '.jpg'), image)
+			filename = '{}_{:04d}{}'.format(layer.name, index, '.jpg')
+			cv2.imwrite(path + '/' + filename, image)

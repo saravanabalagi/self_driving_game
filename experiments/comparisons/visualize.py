@@ -18,6 +18,9 @@ if __name__ == '__main__':
     model = load(count, path=exp_folder)
 
     # Visualize model
-    x_train, x_test, y_train, y_test = get_test_train_data(file, 2, tanh=True)
-    visualize_layers(model, x_test)
+    x_train, x_test, y_train, y_test = get_test_train_data(file, 10, tanh=True)
+    visualization_folder = exp_folder + '/visualization'
+    if not os.path.exists(visualization_folder): os.makedirs(visualization_folder)
+
+    visualize_layers(model, x_test, path=visualization_folder)
     print('Visualization done...!')

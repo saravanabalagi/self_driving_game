@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     # Get test and train data
     file = "E:\Backup\GTA V Dataset\dataset.pz"
-    x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=True)
+    x_train, x_test, y_train, y_test = get_test_train_data(file, 140000, tanh=True)
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 
     # Create model and print to log file
