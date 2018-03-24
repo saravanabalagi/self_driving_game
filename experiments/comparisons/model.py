@@ -14,6 +14,9 @@ backend.set_image_dim_ordering('tf')
 def loss(y_true, y_pred): return backend.sum(backend.abs(y_true - y_pred))
 def accuracy(y_true, y_pred): return 1 - backend.mean(backend.minimum(1.0,((backend.abs(y_true - y_pred))*10)))
 
+loss.__name__ == 'Sum of Absolute Errors'
+accuracy.__name__ == 'Mean of Absolute Errors of upto 0.1'
+
 def tanh_model(channels=1):
     
     h = 75          # height of the image
@@ -42,7 +45,7 @@ def tanh_model(channels=1):
     model.add(Dense(128, kernel_initializer='normal', activation='tanh'))
     model.add(Dense(1))
 
-    model.compile(loss=loss, optimizer=Adam(0.01), metrics=['mae',accuracy])
+    model.compile(loss=loss, optimizer=Adam(0.001), metrics=['mae',accuracy])
     return model
 
 def relu_model(channels=1):
@@ -73,5 +76,5 @@ def relu_model(channels=1):
     model.add(Dense(128, kernel_initializer='normal', activation='relu'))
     model.add(Dense(1))
 
-    model.compile(loss=loss, optimizer=Adam(0.00001), metrics=['mae',accuracy])
+    model.compile(loss=loss, optimizer=Adam(0.001), metrics=['mae',accuracy])
     return model

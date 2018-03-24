@@ -28,6 +28,6 @@ if __name__ == '__main__':
     scores = evaluate_model(model, x_test, y_test)
 
     # Print scores
-    sess = tf.Session()
-    print("Loss: ", sess.run(scores[0]))
-    print("Accuracy: ", sess.run(scores[1])*100, "%")
+    print('\n\n')
+    print("Loss: ", backend.get_value(scores[0]))
+    print("Accuracy: ", backend.get_value(scores[1])*100, "%")
