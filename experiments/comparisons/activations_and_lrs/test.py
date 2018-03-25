@@ -15,7 +15,8 @@ def evaluate_model(model, x_test, y_test):
 
 if __name__ == '__main__':
     
-    file = "F:\Projects\python\self_driving_game\data\dataset_mini.pz"
+    # file = "F:\Projects\python\self_driving_game\data\dataset_mini.pz"
+    file = "E:\Backup\GTA V Dataset\dataset.pz"
     if len(sys.argv)<=1: count = None
     else: count = int(sys.argv[1]);
     
@@ -24,7 +25,8 @@ if __name__ == '__main__':
     model = load(count, path=exp_folder)
 
     # Evaluate model
-    x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=True)
+    x_train, x_test, y_train, y_test = get_test_train_data(file, 10000, tanh=True)
+    print('x_test shape', x_test.shape)
     scores = evaluate_model(model, x_test, y_test)
 
     # Print scores
