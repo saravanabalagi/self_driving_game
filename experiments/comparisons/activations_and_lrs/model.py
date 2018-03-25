@@ -77,8 +77,7 @@ def relu_model(channels=1, learning_rate=0.001):
     dense_4_2 = Dense(1024, kernel_initializer='normal', activation='relu', name='dense_4_2')(dense_4_1)
     dense_4_3 = Dense(128, kernel_initializer='normal', activation='relu', name='dense_4_3')(dense_4_2)
     dense_4_4 = Dense(1, kernel_initializer='normal', activation='sigmoid', name='dense_4_4')(dense_4_3)
-	output = Dense(1, name='output')(dense_4_4)
-
+    output = ScaleLayer(1, name='output')(dense_4_4)
     model = Model(inputs=image, outputs=output)
     model.compile(loss=loss, optimizer=Adam(learning_rate), metrics=['mae',accuracy])
     return model
