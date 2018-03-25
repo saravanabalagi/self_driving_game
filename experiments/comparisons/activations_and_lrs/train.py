@@ -1,6 +1,6 @@
 from keras.callbacks import TensorBoard
 from keras import backend
-from model import relu_model, tanh_model
+from model import relu_model, tanh_model, relu_with_scaled_sigmoid_model
 from test import evaluate_model
 from save_load import save, get_last_file_number
 from preprocess import get_test_train_data
@@ -25,7 +25,7 @@ if __name__ == '__main__':
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 
     learning_rates = [0.01, 0.001, 0.0005, 0.0003, 0.0001]
-    models = ['tanh', 'relu', 'relu_with_scaled_sigmoid']
+    models = ['relu_with_scaled_sigmoid']
 
     for i in range(len(models)):
         for j in range(len(learning_rates)):
