@@ -36,7 +36,7 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
             images.append(image)
             
             # Append outputs
-            outputs.append(var['steering'])
+            outputs.append([var['steering']])
 
             # Stopping criteria
             if data_limit!=-1 and count>=data_limit: break

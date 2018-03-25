@@ -24,7 +24,7 @@ if __name__ == '__main__':
     x_train, x_test, y_train, y_test = get_test_train_data(file, 40000, tanh=False)
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 
-    learning_rates = [0.01, 0.001, 0.0005, 0.0003, 0.0001]
+    learning_rates = [0.0005]
     models = ['relu_with_scaled_sigmoid']
 
     for i in range(len(models)):
