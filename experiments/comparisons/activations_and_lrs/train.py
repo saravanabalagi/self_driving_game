@@ -21,11 +21,11 @@ if __name__ == '__main__':
 
     # Get test and train data
     file = "E:\Backup\GTA V Dataset\dataset.pz"
-    x_train, x_test, y_train, y_test = get_test_train_data(file, 100, tanh=False)
+    x_train, x_test, y_train, y_test = get_test_train_data(file, 40000, tanh=False)
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 
     learning_rates = [0.01, 0.001, 0.0005, 0.0003, 0.0001]
-    models = ['relu', 'tanh']
+    models = ['tanh', 'relu', 'relu_with_scaled_sigmoid']
 
     for i in range(len(models)):
         for j in range(len(learning_rates)):
@@ -40,6 +40,7 @@ if __name__ == '__main__':
 
 
             if models[i] == 'relu': model = relu_model(learning_rate=learning_rates[j])
+            elif models[i] == 'relu_with_scaled_sigmoid': model = relu_with_scaled_sigmoid_model(learning_rate=learning_rates[j])
             elif models[i] == 'tanh': 
                 model = tanh_model(learning_rate=learning_rates[j])
                 x_train = (x_train - 0.5) * 2 
@@ -50,7 +51,7 @@ if __name__ == '__main__':
 
             # Train model
             tbCallBack = TensorBoard(log_dir=outfolder, histogram_freq=0, write_graph=True, write_images=True)
-            model.fit(x_train, y_train, validation_split=0.2, epochs=10, batch_size=250, callbacks=[tbCallBack])
+            model.fit(x_train, y_train, validation_split=0.2, epochs=25, batch_size=250, callbacks=[tbCallBack])
             save(model, path=outfolder)
 
             # Evaluate model
