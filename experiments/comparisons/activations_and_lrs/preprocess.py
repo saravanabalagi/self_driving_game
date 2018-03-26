@@ -38,7 +38,7 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
 
             # Stopping criteria
             if data_limit!=-1 and count>=data_limit: break
-        except EOFError: break
+        except Exception: break
 
     x = np.array(images)
     y = np.array(outputs)
