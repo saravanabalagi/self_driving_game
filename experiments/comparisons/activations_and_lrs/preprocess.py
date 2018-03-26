@@ -5,7 +5,7 @@ import gzip
 import os
 import cv2
 
-def get_test_train_data(file, data_limit=-1):
+def get_test_train_data(file, data_limit=-1, tanh=False):
 
     # Set seed
     np.random.seed(0)
@@ -44,7 +44,8 @@ def get_test_train_data(file, data_limit=-1):
     print('Dataset Shape: x: {} | y: {}'.format(x.shape, y.shape))
 
     # Normalize data
-    x = x/255
+    if tanh: x = (x/255 - 0.5) * 2
+    else: x = x/255
     np.clip(y, -1, 1, out=y)
 
     # Test train split
