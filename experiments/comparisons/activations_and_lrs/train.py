@@ -20,7 +20,7 @@ if __name__ == '__main__':
     # if len(sys.argv)>1: print('Title:',sys.argv[1],'\n\n')
 
     # Get test and train data
-    file = os.environ['DATA_DIR']+ "/dataset_mini.pz"
+    file = os.environ['DATA_DIR']+ "/dataset_75p_gray.pz"
     x_train, x_test, y_train, y_test = get_test_train_data(file, 2000, tanh=False)
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 

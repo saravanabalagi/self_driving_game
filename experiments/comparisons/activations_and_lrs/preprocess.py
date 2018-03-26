@@ -5,7 +5,7 @@ import gzip
 import os
 import cv2
 
-def get_test_train_data(file, data_limit=-1, tanh=False):
+def get_test_train_data(file, data_limit=-1):
 
     # Set seed
     np.random.seed(0)
@@ -20,7 +20,6 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
     count = 0
     images = []
     outputs = []
-    im_reshape = (100, 75)
     pfile = gzip.open(file, mode='rb')
     while True:
         try:
@@ -30,9 +29,6 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
                 
             # Resize and load image
             image = var['frame']
-            image = cv2.resize(image, im_reshape)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            image = image[..., None]
             images.append(image)
             
             # Append outputs
@@ -48,8 +44,7 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
     print('Dataset Shape: x: {} | y: {}'.format(x.shape, y.shape))
 
     # Normalize data
-    if tanh: x = (x/255 - 0.5) * 2
-    else: x = x/255
+    x = x/255
     np.clip(y, -1, 1, out=y)
 
     # Test train split

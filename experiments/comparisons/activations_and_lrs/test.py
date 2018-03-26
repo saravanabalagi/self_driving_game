@@ -16,7 +16,7 @@ def evaluate_model(model, x_test, y_test):
 if __name__ == '__main__':
     
     # file = "F:\Projects\python\self_driving_game\data\dataset_mini.pz"
-    file = "data\dataset_mini.pz"
+    file = os.environ['DATA_DIR']+ "/dataset_75p_gray.pz"
     if len(sys.argv)<=1: count = None
     else: count = int(sys.argv[1]);
     
