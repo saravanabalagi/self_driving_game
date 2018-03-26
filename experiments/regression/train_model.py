@@ -1,4 +1,3 @@
-from tqdm import tqdm
 import numpy as np
 import argparse
 import pickle
@@ -15,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--maps', default=0, help='0 Dont use; 1 Concat with image; 2 Use Separately')
     parser.add_argument('-t', '--throttle', default=False, help='Use throttle or not?')
     parser.add_argument('-b', '--brake', default=False, help='Use brake or not?')
-    parser.add_argument('-p', '--previous_data', default=0, help='How much previous_data to use')
+    parser.add_argument('-c', '--previous_data_count', default=0, help='How much previous_data to use')
     parser.add_argument('-r', '--random_seed', default=None, help='Seed for debugging')
     parser.add_argument('-e', '--epochs', default=None, help='How many epochs to train?')
     parser.add_argument('-e', '--learning_rate', default=None, help='What learning rate to set?')
@@ -30,7 +29,7 @@ if __name__ == '__main__':
     assert 'frame' in var.keys(), 'Could not find dict["frame"]';      im = var['frame']
     assert len(im.shape) == 3, 'Frame has more than 3 layers?';        im_shape  = (im.shape[1], im.shape[0])
     if args.maps!=0:
-        assert 'map' in var.keys(), 'Could not find dict["map"]';          mp = var['map']
+        assert 'minimap' in var.keys(), 'Could not find dict["minimap"]';          mp = var['minimap']
         assert len(mp.shape) == 3, 'Frame has more than 3 layers?';        mp_shape  = (mp.shape[1], mp.shape[0])
 
     # Find resize ratio

@@ -4,7 +4,7 @@ dir=('experiments/comparisons/activations_and_lrs')
 
 for i in "${dir[@]}"
 do
-    while [[ $(squeue | grep s1769454 | wc -l) -gt 0 ]]
+    while [[ $(squeue | grep $(whoami) | wc -l) -gt 0 ]]
     do
         sleep 1
     done
