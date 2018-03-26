@@ -24,11 +24,12 @@ if __name__ == '__main__':
     x_train, x_test, y_train, y_test = get_test_train_data(file, 2000, tanh=False)
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 
-    learning_rates = [0.01, 0.001, 0.0005, 0.0003, 0.0001]
+    learning_rates = 0.0005
     models = ['tanh', 'relu_with_scaled_sigmoid']
+    drop_rates = [0.1, 0.2, 0.3, 0.4]
 
     for i in range(len(models)):
-        for j in range(len(learning_rates)):
+        for j in range(len(drop_rates)):
 
             # Print output to file
             outfolder = 'exp_' + '{0:03d}'.format(get_last_file_number(prefix='exp_', suffix='') + 1); os.makedirs(outfolder)
@@ -36,13 +37,13 @@ if __name__ == '__main__':
             print('Printing to logfile at', outfile)
             sys.stdout = open(outfile, 'w+')
 
-            print('Title:', '{}_adam_{}'.format(models[i], learning_rates[j]),'\n\n')
+            print('Title:', '{}_adam_{}_dropout_rate_{}'.format(models[i], learning_rate, drop_rates[j]),'\n\n')
 
 
             if models[i] == 'relu': model = relu_model(learning_rate=learning_rates[j])
-            elif models[i] == 'relu_with_scaled_sigmoid': model = relu_with_scaled_sigmoid_model(learning_rate=learning_rates[j])
+            elif models[i] == 'relu_with_scaled_sigmoid': model = relu_with_scaled_sigmoid_model(learning_rate=learning_rates, drop_rate=drop_rates[i])
             elif models[i] == 'tanh': 
-                model = tanh_model(learning_rate=learning_rates[j])
+                model = tanh_model(learning_rate=learning_rates[j], drop_rate=drop_rates[i])
                 x_train = (x_train - 0.5) * 2 
                 x_test = (x_test - 0.5) * 2
 
