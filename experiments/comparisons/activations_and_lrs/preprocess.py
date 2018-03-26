@@ -29,6 +29,8 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
                 
             # Resize and load image
             image = var['frame']
+            if(len(image.shape)==2):
+                image = image[..., None]
             images.append(image)
             
             # Append outputs
