@@ -101,7 +101,7 @@ def image_map_steering_concat_model(channels=3):
     pool_3c_1f = Flatten()(pool_3c_1)
 
     # Level 3b
-    prev_steering = Input(shape=(pick_last_steering,))
+    prev_steering = Input(shape=prev_steering.shape[1:])
     dense_3b_1 = Dense(40, kernel_initializer='normal', activation='tanh')(prev_steering)
 
     # Level 4
@@ -158,7 +158,7 @@ def image_map_steering_yaw_concat_model(channels=3):
     pool_3c_1f = Flatten()(pool_3c_1)
 
     # Level 3b
-    prev_steering = Input(shape=(pick_last_steering,))
+    prev_steering = Input(shape=prev_steering.shape[1:])
     dense_3b_1 = Dense(40, kernel_initializer='normal', activation='tanh')(prev_steering)
 
     # Level 4
