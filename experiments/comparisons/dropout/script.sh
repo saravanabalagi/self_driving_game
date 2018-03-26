@@ -5,7 +5,7 @@
 #SBATCH --mem=16000  # memory in Mb
 #SBATCH -o outfile  # send stdout to outfile
 #SBATCH -e errfile  # send stderr to errfile
-#SBATCH -t 1:00:00  # time requested in hour:minute:seconds
+#SBATCH -t 8:00:00  # time requested in hour:minute:seconds
 
 # Setup CUDA and CUDNN related paths
 export CUDA_HOME=/opt/cuda-8.0.44

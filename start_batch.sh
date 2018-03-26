@@ -1,6 +1,6 @@
 #1bin/bash
 
-dir=('experiments/comparisons/activations_and_lrs')
+dir=('experiments/comparisons/batch_norm')
 
 for i in "${dir[@]}"
 do

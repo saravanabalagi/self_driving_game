@@ -121,4 +121,4 @@ def relu_with_scaled_sigmoid_model(channels=1, learning_rate=0.001):
 
     model = Model(inputs=image, outputs=output)
     model.compile(loss=loss, optimizer=Adam(learning_rate), metrics=['mae',accuracy])
-    return model
+return model
