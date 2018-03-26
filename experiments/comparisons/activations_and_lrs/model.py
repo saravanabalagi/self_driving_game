@@ -18,17 +18,16 @@ from keras import backend
 backend.set_image_dim_ordering('tf')
 
 class ScaleLayer(Layer):
-    def __init__(self, output_dim, **kwargs):
-        self.output_dim = output_dim
+    def __init__(self, **kwargs):
         super(ScaleLayer, self).__init__(**kwargs)
     def call(self, x):
         return (x-0.5)*2
     def compute_output_shape(self, input_shape):
-        return (input_shape[0], self.output_dim)
+        return input_shape
+    def build(self, input_shape):
+        super(ScaleLayer, self).build(input_shape)
 
-def loss(y_true, y_pred):
-
-    return backend.sum(backend.abs(y_true - y_pred))
+def loss(y_true, y_pred):     return backend.sum(backend.abs(y_true - y_pred))
 def accuracy(y_true, y_pred): return 1 - backend.mean(backend.minimum(1.0,((backend.abs(y_true - y_pred))*10)))
 
 loss.__name__ == 'Sum of Absolute Errors'
@@ -122,8 +121,8 @@ def relu_with_scaled_sigmoid_model(channels=1, learning_rate=0.001):
     dense_4_2 = Dense(1024, kernel_initializer='normal', activation='relu', name='dense_4_2')(dense_4_1)
     dense_4_3 = Dense(128, kernel_initializer='normal', activation='relu', name='dense_4_3')(dense_4_2)
     dense_4_4 = Dense(1, kernel_initializer='normal', activation='sigmoid', name='dense_4_4')(dense_4_3)
-    output = ScaleLayer(1, name='output')(dense_4_4)
-    
+    output = ScaleLayer(name='output')(dense_4_4)
+
     model = Model(inputs=image, outputs=output)
     model.compile(loss=loss, optimizer=Adam(learning_rate), metrics=['mae',accuracy])
     return model

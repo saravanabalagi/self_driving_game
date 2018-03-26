@@ -110,3 +110,5 @@ models/
 test_model/
 **/graph
 *.h5
+errfile
+outfile
