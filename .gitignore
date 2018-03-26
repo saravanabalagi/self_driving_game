@@ -107,6 +107,7 @@ venv.bak/
 # data and models directory
 data/
 models/
+test_model/
 **/graph
 *.h5
 errfile
