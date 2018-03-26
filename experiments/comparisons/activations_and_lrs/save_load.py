@@ -21,7 +21,7 @@ def save(model, path=None, count=None):
     if count is None: count = get_last_file_number(path) + 1
 
     model_name = 'model_' + '{0:03d}'.format(count)
-    model.save(path + '\\' + model_name + '.h5')
+    model.save(path + '/' + model_name + '.h5')
 
     print("Saving model:" + model_name + '.h5')
 

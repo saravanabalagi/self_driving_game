@@ -109,3 +109,5 @@ data/
 models/
 **/graph
 *.h5
+errfile
+outfile
