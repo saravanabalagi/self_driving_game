@@ -9,4 +9,4 @@ class ScaleLayer(Layer):
     def call(self, x):
         return (x-0.5)*2
     def compute_output_shape(self, input_shape):
-		return (input_shape[0], self.output_dim)
+        return (input_shape[0], self.output_dim)

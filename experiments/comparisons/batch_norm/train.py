@@ -1,6 +1,6 @@
 from keras.callbacks import TensorBoard
 from keras import backend
-from model import relu_model, tanh_model, relu_with_scaled_sigmoid_model
+from model import tanh_model, relu_model, relu_with_scaled_sigmoid_model
 from test import evaluate_model
 from save_load import save, get_last_file_number
 from preprocess import get_test_train_data
