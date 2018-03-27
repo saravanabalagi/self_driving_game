@@ -39,7 +39,9 @@ def visualize_layers(model, test_input, path=None):
 		intermediate_output = intermediate_layer_model.predict(test_input)[-1]
 		intermediate_output = denormalize(intermediate_output)
 		if len(intermediate_output.shape) != 3: continue
-		else: intermediate_output = np.swapaxes(intermediate_output,0,2)
+		else: 
+			intermediate_output = np.swapaxes(intermediate_output,0,2)
+			intermediate_output = np.swapaxes(intermediate_output,1,2)
 		for index, image in enumerate(intermediate_output):
 			filename = '{}_{:04d}{}'.format(layer.name, index, '.jpg')
 			cv2.imwrite(path + '/' + filename, image)
