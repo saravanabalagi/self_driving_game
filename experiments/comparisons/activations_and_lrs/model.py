@@ -7,12 +7,8 @@ from keras.utils import np_utils
 from keras.optimizers import Adam
 from keras.metrics import mae
 from keras.initializers import RandomNormal
-<<<<<<< HEAD
-from custom_class import ScaleLayer
-=======
 from keras.engine.topology import Layer
 import numpy as np
->>>>>>> 96aad9f8376270e2c147f6f1adf0a6f6779fac77
 
 from keras import backend
 backend.set_image_dim_ordering('tf')
@@ -89,8 +85,8 @@ def relu_model(channels=1, learning_rate=0.001):
     dense_4_1 = Dense(2048, kernel_initializer='normal', activation='relu', name='dense_4_1')(flatten_3_3)
     dense_4_2 = Dense(1024, kernel_initializer='normal', activation='relu', name='dense_4_2')(dense_4_1)
     dense_4_3 = Dense(128, kernel_initializer='normal', activation='relu', name='dense_4_3')(dense_4_2)
-    dense_4_4 = Dense(1, kernel_initializer='normal', activation='sigmoid', name='dense_4_4')(dense_4_3)
-    output = ScaleLayer(1, name='output')(dense_4_4)
+    output = Dense(1, kernel_initializer='normal', activation='tanh', name='output')(dense_4_3)
+
     model = Model(inputs=image, outputs=output)
     model.compile(loss=loss, optimizer=Adam(learning_rate), metrics=['mae',accuracy])
     return model

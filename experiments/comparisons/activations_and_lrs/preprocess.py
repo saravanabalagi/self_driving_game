@@ -20,7 +20,6 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
     count = 0
     images = []
     outputs = []
-    im_reshape = (100, 75)
     pfile = gzip.open(file, mode='rb')
     while True:
         try:
@@ -30,9 +29,8 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
                 
             # Resize and load image
             image = var['frame']
-            image = cv2.resize(image, im_reshape)
-            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            image = image[..., None]
+            if(len(image.shape)==2):
+                image = image[..., None]
             images.append(image)
             
             # Append outputs
@@ -40,7 +38,7 @@ def get_test_train_data(file, data_limit=-1, tanh=False):
 
             # Stopping criteria
             if data_limit!=-1 and count>=data_limit: break
-        except EOFError: break
+        except Exception: break
 
     x = np.array(images)
     y = np.array(outputs)
