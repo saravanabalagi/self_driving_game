@@ -2,6 +2,7 @@ from keras.models import load_model
 from model import loss, accuracy
 import h5py
 import os
+from model import ScaleLayer
 
 def get_last_file_number(path=None, prefix='model_', suffix='.h5'):
     if path is None: path = os.getcwd()
@@ -30,6 +31,6 @@ def load(count=None, path=None):
     if count is None: count = get_last_file_number(path)
     if count == -1: print("File not found"); return
     model_name = 'model_' + '{0:03d}'.format(count)
-    model = load_model(path + '\\' + model_name + '.h5', custom_objects={'loss': loss, 'accuracy': accuracy})
-    print('Loaded model:',path + '\\' + model_name + '.h5')
+    model = load_model(path + '/' + model_name + '.h5', custom_objects={'loss': loss, 'accuracy': accuracy, 'ScaleLayer':ScaleLayer})
+    print('Loaded model:',path + '/' + model_name + '.h5')
     return model

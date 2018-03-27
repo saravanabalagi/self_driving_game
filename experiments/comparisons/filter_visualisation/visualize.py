@@ -9,7 +9,7 @@ from utils import visualize_layers
 
 if __name__ == '__main__':
     
-    file = os.environ['DATA_DIR']+ "/dataset_mini.pz"
+    file = os.environ['DATA_DIR']+ "/dataset_75p_gray.pz"
     if len(sys.argv)<=1: count = None
     else: count = int(sys.argv[1]);
     

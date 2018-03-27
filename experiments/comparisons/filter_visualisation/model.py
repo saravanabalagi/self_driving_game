@@ -7,7 +7,6 @@ from keras.utils import np_utils
 from keras.optimizers import Adam
 from keras.metrics import mae
 from keras.initializers import RandomNormal
-from custom_class import ScaleLayer
 from keras.engine.topology import Layer
 import numpy as np
 
