@@ -1,6 +1,6 @@
 #1bin/bash
 
-dir=('experiments/comparisons/filter_visualisation')
+dir=('experiments/regression/frame_map')
 
 for i in "${dir[@]}"
 do
