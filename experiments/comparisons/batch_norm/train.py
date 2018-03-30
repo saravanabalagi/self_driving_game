@@ -24,8 +24,8 @@ if __name__ == '__main__':
     x_train, x_test, y_train, y_test = get_test_train_data(file, tanh=False)
     # x_train, x_test, y_train, y_test = get_test_train_data(file, 1000, tanh=False)
 
-    learning_rates = [0.00005]
-    models = ['tanh']
+    learning_rates = [0.0000005]
+    models = ['relu_with_scaled_sigmoid']
 
     for i in range(len(models)):
         for j in range(len(learning_rates)):
